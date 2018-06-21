@@ -208,7 +208,7 @@ Sends data. The payload can either be a string on an array of bytes(=numbers).
 ## Manually creating a server ##
 
 ```js
-const WebTCP = require("../src/server");
+const WebTCP = require("webtcp");
 // All options are optional. The following values are the default ones.
 const server = new WebTCP({
   // The options for this webtcp server instance

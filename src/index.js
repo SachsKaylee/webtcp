@@ -101,7 +101,6 @@ class WebTCP {
         ...json
       }
       if (this.options.mayConnect({ host: tcpOptions.host, port: tcpOptions.port })) {
-        // todo: disconnect old socket
         const socket = connection[SOCKET] = new Socket();
         socket.connect(tcpOptions.port, tcpOptions.host, () => {
           socket.setEncoding(tcpOptions.encoding);
