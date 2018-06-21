@@ -1,0 +1,19 @@
+{
+  "name": "webtcp",
+  "description": "WebSocket/TCP bridge that allows browsers to interact with TCP servers.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/PatrickSachs/webtcp",
+  "author": "PatrickSachs <kontakt@patrick-sachs.de> (https://patrick-sachs.de)",
+  "main": "./src/server.js",
+  "contributors": [
+    "yankov <artem.yankov@gmail.com> (http://artemyankov.com)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PatrickSachs/webtcp.git"
+  },
+  "dependencies": {
+    "ws": "^5.2.0"
+  },
+  "license": "MIT"
+}
