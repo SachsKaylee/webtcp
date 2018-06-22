@@ -38,7 +38,7 @@ class WebTCP {
   close(connection) {
     if (connection[SOCKET]) {
       this.options.debug && console.log("[webtcp] Closing connection");
-      connection[SOCKET].close();
+      !connection[SOCKET].destroyed && connection[SOCKET].end();
     }
   }
 
@@ -114,19 +114,23 @@ class WebTCP {
         });
         socket.on("end", () => {
           this.options.debug && console.log("[webtcp] Socket end");
-          connection.write({ type: "end" });
+          if (connection.isOpen()) {
+            connection.write({ type: "end" });
+          }
         });
         socket.on("close", hadError => {
           delete connection[SOCKET];
           this.options.debug && console.log("[webtcp] Socket closed", "error?", hadError);
-          connection.write({
-            type: "close",
-            hadError
-          });
+          if (connection.isOpen()) {
+            connection.write({
+              type: "close",
+              hadError
+            });
+          }
         });
         socket.on("timeout", () => {
           this.options.debug && console.log("[webtcp] Socket timeout");
-          socket.close();
+          socket.destroy();
           connection.write({ type: "timeout" });
         });
         socket.on("error", (error) => {
@@ -160,8 +164,10 @@ class WebTCP {
     this.websocket = new WebSocket.Server(this.options.socketOptions);
     this.websocket.on('connection', ws => {
       const connection = {
-        write: data => ws.send(JSON.stringify(data))
+        write: data => ws.send(JSON.stringify(data)),
+        isOpen: () => ws.readyState === WebSocket.OPEN
       };
+      console.log("readyState", ws.readyState)
       ws.on('message', message => this.dispatch(connection, message));
       ws.on("close", () => this.close(connection));
     });
