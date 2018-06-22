@@ -38,7 +38,7 @@ class WebTCP {
   close(connection) {
     if (connection[SOCKET]) {
       this.options.debug && console.log("[webtcp] Closing connection");
-      !connection[SOCKET].destroyed && connection[SOCKET].end();
+      connection[SOCKET].end();
     }
   }
 
