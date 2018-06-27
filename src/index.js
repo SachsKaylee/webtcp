@@ -62,6 +62,7 @@ class WebTCP {
       }
     }
     catch (e) {
+      console.log("error", e);
       connection.write({
         type: "error",
         error: e.message
@@ -82,10 +83,17 @@ class WebTCP {
 
   dispatchData(connection, json) {
     if (connection[SOCKET]) {
-      const payload = typeof json.payload === "string"
-        ? json.payload
-        : Uint8Array.from(json.payload);
-      connection[SOCKET].write(payload, this.options.encoding);
+      if (json.payload !== undefined) {
+        const payload = typeof json.payload === "string"
+          ? json.payload
+          : Uint8Array.from(json.payload);
+        connection[SOCKET].write(payload, this.options.encoding);
+      } else {
+        connection.write({
+          type: "error",
+          error: "no payload"
+        });
+      }
     } else {
       connection.write({
         type: "error",
