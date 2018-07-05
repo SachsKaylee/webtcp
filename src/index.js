@@ -143,7 +143,12 @@ class WebTCP {
         });
         socket.on("error", (error) => {
           this.options.debug && console.log("[webtcp] Socket error", error);
-          connection.write({ type: "error", error: error.errno });
+          if (connection.isOpen()) {
+            connection.write({
+              type: "error",
+              error: error.errno
+            });
+          }
         });
         socket.on("data", payload => {
           this.options.debug && console.log("[webtcp] Socket data", payload);
