@@ -1,14 +1,9 @@
 const { Socket } = require("net");
-const WebSocket = require("ws");
 
 const defaultOptions = {
   // The options for this webtcp server instance
   debug: false,
   mayConnect: () => true,
-  // The options for the websocket server - https://github.com/websockets/ws/blob/master/doc/ws.md#new-websocketserveroptions-callback
-  socketOptions: {
-    port: 9999
-  },
   // The default options for the TCP socket
   defaultTcpOptions: {
     host: "localhost",
@@ -172,7 +167,17 @@ class WebTCP {
     }
   }
 
-  // todo: allow express integration
+  handle(ws, req) {
+    const connection = {
+      write: data => ws.send(JSON.stringify(data)),
+      isOpen: () => ws.readyState === WebSocket.OPEN
+    };
+    console.log("handle-ws", ws, req);
+    ws.on('message', message => this.dispatch(connection, message));
+    ws.on("close", () => this.close(connection));
+  }
+
+  /*// todo: allow express integration
   install() {
     this.websocket = new WebSocket.Server(this.options.socketOptions);
     this.websocket.on('connection', ws => {
@@ -185,7 +190,7 @@ class WebTCP {
       ws.on("close", () => this.close(connection));
     });
     this.options.debug && console.log("[webtcp] Listening", this.options.socketOptions);
-  }
+  }*/
 }
 
 module.exports = WebTCP;
