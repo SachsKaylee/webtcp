@@ -12,11 +12,12 @@
     "type": "git",
     "url": "git://github.com/PatrickSachs/webtcp.git"
   },
-  "dependencies": {
-    "ws": "^5.2.0"
-  },
   "scripts": {
     "example": "node ./examples/server"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "express-ws": "^4.0.0",
+    "express": "^4.16.3"
+  }
 }
