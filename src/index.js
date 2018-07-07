@@ -34,7 +34,6 @@ const defaultOptions = {
     initialDelay: 0
   }
 }
-const SOCKET = "socket";
 
 class WebTCP {
   constructor(options = {}) {
@@ -193,4 +192,9 @@ class WebTCP {
   }
 }
 
-module.exports = WebTCP;
+const install = options => {
+  const tcp = new WebTCP(options);
+  return (ws, req) => tcp.handle(ws, req);
+}
+
+module.exports = install;
