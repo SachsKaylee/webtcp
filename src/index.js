@@ -123,9 +123,10 @@ class WebTCP {
         ...this.options.defaultTcpOptions,
         ...json
       }
+      this.options.debug && console.log("[webtcp] Using connect options", tcpOptions);
       if (this.options.mayConnect({ host: tcpOptions.host, port: tcpOptions.port })) {
         const socket = connection.socket = tcpOptions.ssl
-          ? new TLSSocket(new Socket())
+          ? new TLSSocket()
           : new Socket();
         socket.connect({ port: tcpOptions.port, host: tcpOptions.host }, () => {
           socket.setEncoding(tcpOptions.encoding);
