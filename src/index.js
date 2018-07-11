@@ -1,4 +1,5 @@
 const { Socket } = require("net");
+const { TLSSocket } = require("tls");
 
 /**
  * The numeric ready states of the WebSocket.
@@ -27,6 +28,7 @@ const defaultOptions = {
   defaultTcpOptions: {
     host: "localhost",
     port: 9998,
+    ssl: false,
     encoding: "utf8",
     timeout: 0,
     noDelay: false,
@@ -122,8 +124,10 @@ class WebTCP {
         ...json
       }
       if (this.options.mayConnect({ host: tcpOptions.host, port: tcpOptions.port })) {
-        const socket = connection.socket = new Socket();
-        socket.connect(tcpOptions.port, tcpOptions.host, () => {
+        const socket = connection.socket = tcpOptions.ssl
+          ? new TLSSocket(new Socket())
+          : new Socket();
+        socket.connect({ port: tcpOptions.port, host: tcpOptions.host }, () => {
           socket.setEncoding(tcpOptions.encoding);
           socket.setTimeout(tcpOptions.timeout);
           socket.setNoDelay(tcpOptions.noDelay);
