@@ -1,8 +1,8 @@
-# WebTCP 0.0.1 #
+# WebTCP 1.0.0 #
 
 Inspired by the original WebTCP: [yankov/webtcp](https://github.com/yankov/webtcp)
 
-WebTCP allows users to create a raw TCP socket using WebSockets.
+WebTCP allows users to create a raw TCP(With optional SSL support) socket using WebSockets.
 
 Why a new library? The old library is abandoned, has too much functionality for being a raw TCP socket, and the code was hard to understand for me.
 
@@ -20,29 +20,39 @@ Sometimes an API does not provide a way to communicate through HTTP or WebSocket
 
 This library allows users to leverage your server to create raw TCP sockets. They can literally do anything with that, all using your servers IP. 
 
-You would have to limit which servers users adbility to connect to certain servers(`options.mayConnect`), properly encrypt the traffic both ways, etc.
+You would have to limit your users ability to connect to certain servers(`options.mayConnect`), properly encrypt the traffic both ways, etc.
 
 This library is not battle tested and is primarily used for prototyping by me.
 
 ## Installing ##
 
-Assuming you have `node.js` and `npm` installed:
+Assuming you have `node.js`, `npm` and `git` installed:
+
+### Add as a dependency for using in your project ###
+
+```
+npm install webtcp
+```
+
+### Clone the repository for testing/contributing ###
 
 **Clone the repo**  
+
 ```
 git clone https://github.com/PatrickSachs/webtcp
 ```
 
 **Install dependencies**  
+
 ```
 cd webtcp
 npm install
 ```
 
 **Run WebTCP example server**  
+
 ```
-cd examples
-node server
+npm run example
 ```
 
 Your WebTCP server will now be hosted on localhost:9999.
@@ -180,7 +190,8 @@ Used to connect to a TCP server.
   "timeout": "<number>",
   "noDelay": "<boolean>",
   "keepAlive": "<boolean>",
-  "initialDelay": "<number>"
+  "initialDelay": "<number>",
+  "ssl": "<boolean>"
 }
 ```
 
@@ -207,21 +218,39 @@ Sends data. The payload can either be a string on an array of bytes(=numbers).
 
 ## Manually creating a server ##
 
+This is pretty much a copy of the example included under `/examples/server.js`, but it's always nice to see a code example.
+
+As you can see WebTCP integrates seamlessly into express using the `express-ws` library. You can of course roll your own solution, which would require you to adjust the `createConnection` function passed in the options to use your WebSocket API.
+
 ```js
-const WebTCP = require("webtcp");
+const webtcp = require("../src");
+const express = require("express");
+const enableWebsockets = require("express-ws");
+
+const PORT = 9999;
+
+const app = express();
+enableWebsockets(app);
+
 // All options are optional. The following values are the default ones.
-const server = new WebTCP({
+app.ws("/", ({
   // The options for this webtcp server instance
   debug: false,
   mayConnect: ({host, port}) => true,
-  // The options for the websocket server - https://github.com/websockets/ws/blob/master/doc/ws.md#new-websocketserveroptions-callback
-  socketOptions: {
-    port: 9999
-  },
+  // Creates the connection/session object if you are using a non-default WebSocket implementation.
+  createConnection: (ws, _req) => ({
+    // Sends a JSON object over the WebSocket.
+    send: data => ws.send(JSON.stringify(data)),
+    // Checks if the socket is open. If this returns true, the server assumes that calling send will work.
+    isOpen: () => ws.readyState === READY_STATE.OPEN,
+    // Placeholder for the TCP socket. Simply set this to null unless you need to get really fancy.
+    socket: null
+  }),
   // The default options for the TCP socket
   defaultTcpOptions: {
     host: "localhost",
     port: 9998,
+    ssl: false,
     encoding: "utf8",
     timeout: 0,
     noDelay: false,
@@ -229,7 +258,7 @@ const server = new WebTCP({
     initialDelay: 0
   }
 });
-server.install();
+app.listen(PORT, () => console.log(`[webtcp] Running on port ${PORT}!`));
 ```
 
 ## Contributing ##
