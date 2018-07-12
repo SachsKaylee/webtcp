@@ -57,8 +57,6 @@ npm run example
 
 Your WebTCP server will now be hosted on localhost:9999.
 
-The library is not published to npm. If you want to use it as a dep in your project you'll have to manually add it to your package.json([See here for details](https://stackoverflow.com/questions/23210437/npm-install-private-github-repositories-by-dependency-in-package-json)).
-
 ## How to use it ##
 
 ### Client usage ###
