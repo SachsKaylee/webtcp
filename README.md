@@ -16,13 +16,13 @@ Sometimes an API does not provide a way to communicate through HTTP or WebSocket
 
 ## Can I use this in production? ##
 
-**NO.** *Not without heavy security additions.*
+**Not without adjusting the configuration object.**
 
-This library allows users to leverage your server to create raw TCP sockets. They can literally do anything with that, all using your servers IP. 
+Why? This library allows users to leverage your server to create raw TCP sockets. They can literally do anything with that, all using your servers IP. 
 
-You would have to limit your users ability to connect to certain servers(`options.mayConnect`), properly encrypt the traffic both ways, etc.
+You would have to limit your users ability to connect to certain servers(`options.mayConnect`), properly encrypt the traffic both ways by using the `ssl` option, etc.
 
-This library is not battle tested and is primarily used for prototyping by me.
+This library is not battle tested and is primarily used for prototyping by me, so be careful.
 
 ## Installing ##
 
@@ -61,7 +61,8 @@ Your WebTCP server will now be hosted on localhost:9999.
 
 ### Client usage ###
 
-Connect to the server using a WebSocket. 
+Connect to the bridge using a WebSocket. 
+**Important:** Do not connect to the TCP server you want to communicate with here. You need to connect to the TCP bridge first. After connecting to the bridge you can then connect to the TCP server(as seen in the next step).
 
 ```js
 const socket = new WebSocket("localhost", 9999);
@@ -80,6 +81,7 @@ socket.send(JSON.stringify({
 ```
 
 Assuming everything went smooth the bridge will respond with
+
 ```json
 {
   "type": "connect"
@@ -100,7 +102,8 @@ socket.send(JSON.stringify({
 }));  
 ```
 
-We once we are done, let's close the socket again:
+Once we are done, let's close the socket again:
+
 ```js
 socket.send(JSON.stringify({
   type: "close"
@@ -143,7 +146,7 @@ Sent when the other end closed the socket by sending a FIN packet.
 
 ### close ###
 
-Sent when the socket is closed. If hadError is true an eror event will be emitted aswell.
+Sent when the socket is closed. If hadError is true an error event will be emitted aswell.
 
 ```json
 {
@@ -221,7 +224,7 @@ This is pretty much a copy of the example included under `/examples/server.js`, 
 As you can see WebTCP integrates seamlessly into express using the `express-ws` library. You can of course roll your own solution, which would require you to adjust the `createConnection` function passed in the options to use your WebSocket API.
 
 ```js
-const webtcp = require("../src");
+const webtcp = require("webtcp");
 const express = require("express");
 const enableWebsockets = require("express-ws");
 
