@@ -234,12 +234,12 @@ const app = express();
 enableWebsockets(app);
 
 // All options are optional. The following values are the default ones.
-app.ws("/", ({
+app.ws("/", webtcp({
   // The options for this webtcp server instance
   debug: false,
   mayConnect: ({host, port}) => true,
   // Creates the connection/session object if you are using a non-default WebSocket implementation.
-  createConnection: (ws, _req) => ({
+  createConnection: (ws, req) => ({
     // Sends a JSON object over the WebSocket.
     send: data => ws.send(JSON.stringify(data)),
     // Checks if the socket is open. If this returns true, the server assumes that calling send will work.
